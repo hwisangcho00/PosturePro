@@ -15,6 +15,29 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     last_login = Column(DateTime)
 
+class UserMetrics(Base):
+    __tablename__ = "user_metrics"
+
+    user_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    # Discuss at next meeting what to include in this user metrics 
+    left_back = Column(DECIMAL(5, 2))
+    right_back = Column(DECIMAL(5, 2))
+    left_leg = Column(DECIMAL(5, 2))
+    right_leg = Column(DECIMAL(5, 2))
+    timestamp = Column(String, nullable=False)
+
+
+
+    def to_dict(self):
+        return {
+            "user_id": self.user_id,
+            "left_back": self.left_back,
+            "right_back": self.right_back,
+            "left_leg": self.left_leg,
+            "right_leg": self.right_leg,
+            "timestamp": self.timestamp
+        }
+
 class WorkoutType(Base):
     __tablename__ = "workout_types"
 
