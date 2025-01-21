@@ -1,6 +1,6 @@
 from pydantic import BaseModel, UUID4
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Any
 
 class UserCreate(BaseModel):
     email: str
@@ -70,6 +70,18 @@ class WorkoutSetResponse(BaseModel):
     reps: int
     weight: Optional[float]
     created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class HardwareDataCreate(BaseModel):
+    set_id: UUID4
+    data: Any
+
+class HardwareDataResponse(BaseModel):
+    set_id: UUID4
+    data: Any
 
     class Config:
         orm_mode = True

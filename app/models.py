@@ -2,6 +2,7 @@ from sqlalchemy import  Column, String, DateTime, Integer, ForeignKey, DECIMAL, 
 from sqlalchemy.orm import relationship
 from app.database import Base
 from datetime import datetime, timezone
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 import uuid
 
 class User(Base):
@@ -15,6 +16,12 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     last_login = Column(DateTime)
 
+class HardwareData(Base):
+    __tablename__ = "hardware_data"
+
+    set_id = Column(String, ForeignKey("workout_sets.set_id", ondelete="CASCADE"), primary_key=True)
+    data = Column(JSONB, nullable=False)
+
 class UserMetrics(Base):
     __tablename__ = "user_metrics"
 
@@ -25,8 +32,6 @@ class UserMetrics(Base):
     left_leg = Column(DECIMAL(5, 2))
     right_leg = Column(DECIMAL(5, 2))
     timestamp = Column(String, nullable=False)
-
-
 
     def to_dict(self):
         return {
