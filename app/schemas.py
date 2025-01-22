@@ -1,6 +1,6 @@
 from pydantic import BaseModel, UUID4
 from datetime import datetime, timedelta
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
 class UserCreate(BaseModel):
     email: str
@@ -81,7 +81,7 @@ class HardwareDataCreate(BaseModel):
 
 class HardwareDataResponse(BaseModel):
     set_id: str
-    data: Any
+    averages: Dict[str, float]
 
     class Config:
         orm_mode = True

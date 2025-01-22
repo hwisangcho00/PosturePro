@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app import models, schemas
+from typing import Optional
 
 # ----------- User CRUD Operations -----------
 
@@ -82,5 +83,26 @@ def create_hardware_data(db: Session, hardware_data: schemas.HardwareDataCreate)
     db.refresh(db_data)
     return db_data
 
-def get_hardware_data_by_set_id(db: Session, set_id: str):
-    return db.query(HardwareData).filter(HardwareData.set_id == set_id).first()
+def get_average_by_set_id(db: Session, set_id: str) -> Optional[dict]:
+    # Query the database for the hardware data
+    hardware_data = db.query(models.HardwareData).filter(models.HardwareData.set_id == set_id).first()
+
+    if not hardware_data:
+        return None
+
+    # Parse the JSON data
+    data = hardware_data.data
+
+    # Ensure the required keys exist
+    required_keys = ['xs', 'ys', 'zs', 'gxs', 'gys', 'gzs', 'envs', 'raws', 'rects']
+    if not all(key in data for key in required_keys):
+        raise ValueError("Missing required keys in hardware data JSON")
+
+    # Compute the averages for each array
+    averages = {key: sum(data[key]) / len(data[key]) if data[key] else 0 for key in required_keys}
+
+    # Return the analysis result
+    return {
+        "set_id": hardware_data.set_id,
+        "averages": averages
+    }
