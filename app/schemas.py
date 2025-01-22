@@ -76,11 +76,11 @@ class WorkoutSetResponse(BaseModel):
 
 
 class HardwareDataCreate(BaseModel):
-    set_id: UUID4
+    set_id: str
     data: Any
 
 class HardwareDataResponse(BaseModel):
-    set_id: UUID4
+    set_id: str
     data: Any
 
     class Config:

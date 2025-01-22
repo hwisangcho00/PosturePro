@@ -6,7 +6,7 @@ from app.schemas import HardwareDataCreate, HardwareDataResponse
 
 router = APIRouter()
 
-@router.post("/hardware", response_model=HardwareDataResponse)
+@router.post("/add/", response_model=HardwareDataResponse)
 def add_hardware_data(hardware_data: HardwareDataCreate, db: Session = Depends(get_db)):
     return create_hardware_data(db, hardware_data)
 

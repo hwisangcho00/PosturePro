@@ -19,7 +19,7 @@ class User(Base):
 class HardwareData(Base):
     __tablename__ = "hardware_data"
 
-    set_id = Column(String, ForeignKey("workout_sets.set_id", ondelete="CASCADE"), primary_key=True)
+    set_id = Column(String(255), primary_key=True)
     data = Column(JSONB, nullable=False)
 
 class UserMetrics(Base):

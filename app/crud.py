@@ -73,7 +73,7 @@ def get_sets_by_session_id(db: Session, session_id: str):
 
 # ----------- Hardware Data CRUD Operations -----------
 def create_hardware_data(db: Session, hardware_data: schemas.HardwareDataCreate):
-    db_data = HardwareData(
+    db_data = models.HardwareData(
         set_id=hardware_data.set_id,
         data=hardware_data.data
     )
