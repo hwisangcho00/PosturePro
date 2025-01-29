@@ -8,13 +8,10 @@ import uuid
 class User(Base):
     __tablename__ = "users"
 
-    user_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    email = Column(String, unique=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    first_name = Column(String)
-    last_name = Column(String)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    last_login = Column(DateTime)
+    email = Column(String(255), primary_key=True, unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    first_name = Column(String(100))
+    last_name = Column(String(100))
 
 class HardwareData(Base):
     __tablename__ = "hardware_data"
@@ -53,13 +50,12 @@ class WorkoutType(Base):
 class WorkoutSession(Base):
     __tablename__ = "workout_sessions"
 
-    session_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(String, ForeignKey("users.user_id", ondelete="CASCADE"))
+    session_id = Column(String(100), primary_key=True)
+    email = Column(String(255), ForeignKey("users.email", ondelete="CASCADE"), nullable=False)
     workout_type_id = Column(String(50), ForeignKey("workout_types.workout_type_id", ondelete="SET NULL"))
     start_time = Column(DateTime, default=datetime.now(timezone.utc))
     end_time = Column(DateTime)
     total_duration = Column(Interval)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     user = relationship("User")
     workout_type = relationship("WorkoutType")
@@ -67,11 +63,8 @@ class WorkoutSession(Base):
 class WorkoutSet(Base):
     __tablename__ = "workout_sets"
 
-    set_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    session_id = Column(String, ForeignKey("workout_sessions.session_id", ondelete="CASCADE"))
-    set_number = Column(Integer)
-    reps = Column(Integer)
-    weight = Column(DECIMAL(5, 2))
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
-
-    session = relationship("WorkoutSession")
+    set_id = Column(String(150), primary_key=True)  # session_id + _setNumber
+    session_id = Column(String(100), ForeignKey("workout_sessions.session_id", ondelete="CASCADE"), nullable=False)
+    set_number = Column(Integer, nullable=False)
+    reps = Column(Integer, nullable=False)
+    weight = Column(DECIMAL(5,2), nullable=True)

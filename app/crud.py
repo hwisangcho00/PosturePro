@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from app import models, schemas
-from typing import Optional
+from typing import Optional, List
 
 # ----------- User CRUD Operations -----------
 
 def create_user(db: Session, user: schemas.UserCreate):
-    db_user = models.User(
+    db_user = User(
         email=user.email,
         password_hash=user.password_hash,
         first_name=user.first_name,
@@ -19,9 +19,6 @@ def create_user(db: Session, user: schemas.UserCreate):
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
-def get_user_by_id(db: Session, user_id: str):
-    return db.query(models.User).filter(models.User.user_id == user_id).first()
-
 # ----------- Workout Type CRUD Operations -----------
 
 def get_workout_type(db: Session, workout_type_id: str):
@@ -29,36 +26,52 @@ def get_workout_type(db: Session, workout_type_id: str):
 
 # ----------- Workout Session CRUD Operations -----------
 
-def create_workout_session(db: Session, session: schemas.WorkoutSessionCreate):
-    db_session = models.WorkoutSession(
-        user_id=session.user_id,
-        workout_type_id=session.workout_type_id,
+def generate_session_id(email: str) -> str:
+    """Generate a unique session_id based on email + timestamp."""
+    timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+    return f"{email}_{timestamp}"
+
+def create_workout_session(db: Session, session_data: schemas.WorkoutSessionCreate):
+    """Create a new workout session with email + timestamp as session_id."""
+    session_id = generate_session_id(session_data.email)
+
+    db_session = WorkoutSession(
+        session_id=session_id,
+        email=session_data.email,
+        workout_type_id=session_data.workout_type_id,
     )
     db.add(db_session)
     db.commit()
     db.refresh(db_session)
     return db_session
 
-def get_workout_session(db: Session, session_id: str):
-    return db.query(models.WorkoutSession).filter(models.WorkoutSession.session_id == session_id).first()
-
-def get_sessions_by_user_id(db: Session, user_id: str):
-    return db.query(models.WorkoutSession).filter(models.WorkoutSession.user_id == user_id).all()
-
-def get_sessions_by_workout_type_and_user(db: Session, workout_type_id: str, user_id: str):
-    return db.query(models.WorkoutSession).filter(
-        models.WorkoutSession.workout_type_id == workout_type_id,
-        models.WorkoutSession.user_id == user_id
-    ).all()
+def get_workout_sessions_by_email(db: Session, email: str, limit: int = 10) -> List[schemas.WorkoutSessionResponse]:
+    """Retrieve latest workout sessions for a given user email."""
+    sessions = (
+        db.query(WorkoutSession)
+        .filter(WorkoutSession.email == email)
+        .order_by(WorkoutSession.session_id.desc())  # Sort newest first
+        .limit(limit)
+        .all()
+    )
+    return sessions
 
 # ----------- Workout Set CRUD Operations -----------
 
+def generate_set_id(session_id: str, set_number: int) -> str:
+    """Generate a unique set_id using session_id + _setNumber."""
+    return f"{session_id}_{set_number}"
+
 def create_workout_set(db: Session, workout_set: schemas.WorkoutSetCreate):
-    db_set = models.WorkoutSet(
-        session_id=workout_set.session_id,
-        set_number=workout_set.set_number,
-        reps=workout_set.reps,
-        weight=workout_set.weight,
+    """Create a new workout set with a structured set_id."""
+    set_id = generate_set_id(set_data.session_id, set_data.set_number)
+
+    db_set = WorkoutSet(
+        set_id=set_id,
+        session_id=set_data.session_id,
+        set_number=set_data.set_number,
+        reps=set_data.reps,
+        weight=set_data.weight
     )
     db.add(db_set)
     db.commit()

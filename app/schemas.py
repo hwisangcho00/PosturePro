@@ -1,22 +1,20 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel, UUID4, EmailStr
 from datetime import datetime, timedelta
 from typing import Optional, Any, Dict
 
 class UserCreate(BaseModel):
-    email: str
+    email: EmailStr
     password_hash: str
     first_name: str
     last_name: str
 
 class UserResponse(BaseModel):
-    user_id: UUID4
-    email: str
+    email: EmailStr
     first_name: str
     last_name: str
-    created_at: datetime
 
     class Config:
-        orm_mode = True  # Allows SQLAlchemy objects to be returned as Pydantic models
+        from_attributes = True
 
 # Schema for WorkoutType
 class WorkoutTypeBase(BaseModel):
@@ -26,20 +24,19 @@ class WorkoutTypeBase(BaseModel):
 
 class WorkoutTypeResponse(WorkoutTypeBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Schema for WorkoutSession
 class WorkoutSessionCreate(BaseModel):
-    user_id: UUID4
+    email: EmailStr
     workout_type_id: str
 
 class WorkoutSessionResponse(BaseModel):
-    session_id: UUID4
-    user_id: UUID4
+    session_id: str
+    email: EmailStr
     workout_type_id: str
     start_time: datetime
     end_time: Optional[datetime] = None
-    created_at: datetime
 
     # Declare `total_duration` as a property
     @property
@@ -54,25 +51,24 @@ class WorkoutSessionResponse(BaseModel):
         self._total_duration = value
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Schema for WorkoutSet
 class WorkoutSetCreate(BaseModel):
-    session_id: UUID4
+    session_id: str
     set_number: int
     reps: int
     weight: Optional[float] = None
 
 class WorkoutSetResponse(BaseModel):
-    set_id: UUID4
-    session_id: UUID4
+    set_id: str
+    session_id: str
     set_number: int
     reps: int
     weight: Optional[float]
-    created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class HardwareDataCreate(BaseModel):
@@ -84,4 +80,4 @@ class HardwareDataResponse(BaseModel):
     averages: Dict[str, float]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
