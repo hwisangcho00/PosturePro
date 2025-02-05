@@ -28,6 +28,7 @@ class WorkoutTypeResponse(WorkoutTypeBase):
 
 # Schema for WorkoutSession
 class WorkoutSessionCreate(BaseModel):
+    session_id: str
     email: EmailStr
     workout_type_id: str
 
@@ -77,7 +78,7 @@ class HardwareDataCreate(BaseModel):
 
 class HardwareDataResponse(BaseModel):
     set_id: str
-    averages: Dict[str, float]
+    data: Any
 
     class Config:
         from_attributes = True

@@ -11,7 +11,7 @@ router = APIRouter()
 @router.post("/sessions", response_model=schemas.WorkoutSessionResponse)
 def add_workout_session(session_data: schemas.WorkoutSessionCreate, db: Session = Depends(get_db)):
     """API endpoint to create a new workout session."""
-    return create_workout_session(db, session_data)
+    return crud.create_workout_session(db, session_data)
 
 @router.get("/sessions/{email}", response_model=List[schemas.WorkoutSessionResponse])
 def get_workout_sessions(
@@ -20,7 +20,7 @@ def get_workout_sessions(
     db: Session = Depends(get_db)
 ):
     """API endpoint to get latest workout sessions for a user, with adjustable limit."""
-    return get_workout_sessions_by_email(db, email, limit)
+    return crud.get_workout_sessions_by_email(db, email, limit)
 
 
 # ----------- Workout Set -----------
