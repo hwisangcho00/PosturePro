@@ -47,12 +47,12 @@ class WorkoutSetCreate(BaseModel):
     session_id: str
     set_number: int
     reps: int
+    data: Any
     weight: Optional[float] = None
 
 class WorkoutSetResponse(BaseModel):
     set_id: str
     session_id: str
-    set_number: int
     reps: int
     weight: Optional[float]
 
