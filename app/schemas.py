@@ -16,26 +16,14 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# Schema for WorkoutType
-class WorkoutTypeBase(BaseModel):
-    workout_type_id: str
-    name: str
-    description: Optional[str] = None
-
-class WorkoutTypeResponse(WorkoutTypeBase):
-    class Config:
-        from_attributes = True
-
 # Schema for WorkoutSession
 class WorkoutSessionCreate(BaseModel):
     session_id: str
     email: EmailStr
-    workout_type_id: str
 
 class WorkoutSessionResponse(BaseModel):
     session_id: str
     email: EmailStr
-    workout_type_id: str
     start_time: datetime
     end_time: Optional[datetime] = None
 
