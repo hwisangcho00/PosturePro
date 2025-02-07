@@ -44,20 +44,27 @@ class WorkoutSessionResponse(BaseModel):
 
 # Schema for WorkoutSet
 class WorkoutSetCreate(BaseModel):
+    set_id: str
     session_id: str
-    set_number: int
-    reps: int
-    data: Any
+    reps: Any
     weight: Optional[float] = None
 
 class WorkoutSetResponse(BaseModel):
     set_id: str
     session_id: str
-    reps: int
     weight: Optional[float]
 
     class Config:
         from_attributes = True
+
+
+class WorkoutRepResponse(BaseModel):
+    rep_id: str
+    set_id: str
+    data: Any  # JSONB data
+
+    class Config:
+        from_attributes = True  # ✅ Ensures SQLAlchemy objects can be converted to JSON
 
 
 class HardwareDataCreate(BaseModel):

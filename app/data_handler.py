@@ -4,7 +4,6 @@ import pandas as pd
 from statistics import mean
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import UserMetrics
 
 # Function to save user data
 def save_user_data(user_id, user_metrics, db : Session):

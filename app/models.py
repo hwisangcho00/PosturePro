@@ -40,33 +40,33 @@ class User(Base):
 #             "timestamp": self.timestamp
 #         }
 
-class WorkoutType(Base):
-    __tablename__ = "workout_types"
+# class WorkoutType(Base):
+#     __tablename__ = "workout_types"
 
-    workout_type_id = Column(String(50), primary_key=True)  # e.g., "squat", "deadlift"
-    name = Column(String(100), nullable=False)
-    description = Column(String)
+#     workout_type_id = Column(String(50), primary_key=True)  # e.g., "squat", "deadlift"
+#     name = Column(String(100), nullable=False)
+#     description = Column(String)
 
 class WorkoutSession(Base):
     __tablename__ = "workout_sessions"
 
     session_id = Column(String(100), primary_key=True)
     email = Column(String(255), ForeignKey("users.email", ondelete="CASCADE"), nullable=False)
-    workout_type_id = Column(String(50), ForeignKey("workout_types.workout_type_id", ondelete="SET NULL"))
     start_time = Column(DateTime, default=datetime.now(timezone.utc))
     end_time = Column(DateTime)
     total_duration = Column(Interval)
 
     user = relationship("User")
-    workout_type = relationship("WorkoutType")
 
 class WorkoutSet(Base):
     __tablename__ = "workout_sets"
 
     set_id = Column(String(150), primary_key=True)  # session_id + _setNumber
     session_id = Column(String(100), ForeignKey("workout_sessions.session_id", ondelete="CASCADE"), nullable=False)
-    reps = Column(Integer, nullable=False)
+    reps = Column(JSONB, nullable=False)
     weight = Column(DECIMAL(5,2), nullable=True)
+
+    reps = relationship("WorkoutRep", back_populates="set", cascade="all, delete-orphan")
 
 class WorkoutRep(Base):
     __tablename__ = "workout_reps"
@@ -74,3 +74,5 @@ class WorkoutRep(Base):
     rep_id = Column(String(150), primary_key=True)  # set_id + _repNumber
     set_id = Column(String(150), ForeignKey("workout_sets.set_id", ondelete="CASCADE"), nullable=False)
     data = Column(JSONB, nullable=False)
+
+    set = relationship("WorkoutSet", back_populates="reps")

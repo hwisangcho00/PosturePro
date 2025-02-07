@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app import models, schemas
 from typing import Optional, List
 from sqlalchemy.dialects.postgresql import insert
+import json
 
 
 # ----------- User CRUD Operations -----------
@@ -33,8 +34,7 @@ def create_workout_session(db: Session, session_data: schemas.WorkoutSessionCrea
     """Create a new workout session with email + timestamp as session_id."""
     db_session = models.WorkoutSession(
         session_id=session_data.session_id,
-        email=session_data.email,
-        workout_type_id=session_data.workout_type_id,
+        email=session_data.email
     )
     db.add(db_session)
     db.commit()
@@ -54,25 +54,37 @@ def get_workout_sessions_by_email(db: Session, email: str, limit: int = 10) -> L
 
 # ----------- Workout Set CRUD Operations -----------
 
-def generate_set_id(session_id: str, set_number: int) -> str:
-    """Generate a unique set_id using session_id + _setNumber."""
-    return f"{session_id}_{set_number}"
 
 def create_workout_set(db: Session, set_data: schemas.WorkoutSetCreate):
-    """Create a new workout set with a structured set_id."""
-    set_id = generate_set_id(set_data.session_id, set_data.set_number)
+    try:
+        # Step 1: Create and commit the workout set first
+        db_set = models.WorkoutSet(
+            set_id=set_data.set_id,
+            session_id=set_data.session_id,
+            weight=set_data.weight
+        )
+        db.add(db_set)
+        db.commit()  # Commit the set first to ensure FK integrity
+        db.refresh(db_set)
 
-    db_set = models.WorkoutSet(
-        set_id=set_id,
-        session_id=set_data.session_id,
-        set_number=set_data.set_number,
-        reps=set_data.reps,
-        weight=set_data.weight
-    )
-    db.add(db_set)
-    db.commit()
-    db.refresh(db_set)
-    return db_set
+        # Step 2: Parse JSON reps data correctly
+        parsed_reps = json.loads(set_data.reps) if isinstance(set_data.reps, str) else set_data.reps
+        if not isinstance(parsed_reps, dict):
+            raise ValueError("Invalid format for reps data. Expected a dictionary.")
+
+        # Step 3: Add each rep to the workout_reps table
+        for rep_number, rep_data in parsed_reps.items():
+            rep_id = f"{set_data.set_id}_{rep_number}"  # Generate unique rep_id
+            db_rep = models.WorkoutRep(rep_id=rep_id, set_id=set_data.set_id, data=rep_data)
+            db.add(db_rep)
+
+        db.commit()  # Commit all reps at once
+        return db_set
+
+    except Exception as e:
+        db.rollback()  # Rollback transaction in case of an error
+        raise e  # Raise the error for debugging/logging
+
 
 def get_workout_set(db: Session, set_id: str):
     return db.query(models.WorkoutSet).filter(models.WorkoutSet.set_id == set_id).first()
@@ -80,6 +92,8 @@ def get_workout_set(db: Session, set_id: str):
 # Retrieve all sets for a specific workout session
 def get_sets_by_session_id(db: Session, session_id: str):
     return db.query(models.WorkoutSet).filter(models.WorkoutSet.session_id == session_id).all()
+
+
 
 # ----------- Hardware Data CRUD Operations -----------
 def create_hardware_data(db: Session, hardware_data: schemas.HardwareDataCreate):
