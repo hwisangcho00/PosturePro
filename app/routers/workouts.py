@@ -22,6 +22,15 @@ def get_workout_sessions(
     """API endpoint to get latest workout sessions for a user, with adjustable limit."""
     return crud.get_workout_sessions_by_email(db, email, limit)
 
+# ----------- Workout Rep -----------
+@router.post("/reps/", response_model=schemas.WorkoutRepResponse)
+def create_rep(rep: schemas.WorkoutRepCreate, db: Session = Depends(get_db)):
+    try:
+        created_rep = crud.create_workout_rep(db=db, rep_data=rep)
+        return created_rep
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 # ----------- Workout Set -----------
 

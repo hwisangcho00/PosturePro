@@ -57,6 +57,10 @@ class WorkoutSetResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class WorkoutRepCreate(BaseModel):
+    rep_id: str
+    set_id: str
+    data: Any  # JSONB data
 
 class WorkoutRepResponse(BaseModel):
     rep_id: str

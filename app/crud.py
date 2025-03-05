@@ -52,6 +52,19 @@ def get_workout_sessions_by_email(db: Session, email: str, limit: int = 10) -> L
     )
     return sessions
 
+# ----------- Workout Rep CRUD Operations -----------
+def create_workout_rep(db: Session, rep_data: schemas.WorkoutRepCreate):
+    db_rep = models.WorkoutRep(
+        rep_id=rep_data.rep_id,
+        set_id=rep_data.set_id,
+        data=rep_data.data
+    )
+    db.add(db_rep)
+    db.commit()
+    db.refresh(db_rep)
+    return db_rep
+
+
 # ----------- Workout Set CRUD Operations -----------
 
 
