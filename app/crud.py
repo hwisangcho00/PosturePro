@@ -67,6 +67,16 @@ def create_workout_rep(db: Session, rep_data: schemas.WorkoutRepCreate):
 
 # ----------- Workout Set CRUD Operations -----------
 
+def create_basic_workout_set(db: Session, set_data: schemas.WorkoutSetBasicCreate):
+    db_set = models.WorkoutSet(
+        set_id=set_data.set_id,
+        session_id=set_data.session_id,
+        weight=set_data.weight
+    )
+    db.add(db_set)
+    db.commit()
+    db.refresh(db_set)
+    return db_set
 
 def create_workout_set(db: Session, set_data: schemas.WorkoutSetCreate):
     try:

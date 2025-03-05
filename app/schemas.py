@@ -57,6 +57,20 @@ class WorkoutSetResponse(BaseModel):
     class Config:
         from_attributes = True
 
+# Schema for WorkoutSet w/o reps
+class WorkoutSetBasicCreate(BaseModel):
+    set_id: str        # Provided by the mobile app
+    session_id: str    # The associated workout session ID
+    weight: Optional[float] = None
+
+class WorkoutSetBasicResponse(BaseModel):
+    set_id: str
+    session_id: str
+    weight: Optional[float]
+    
+    class Config:
+        from_attributes = True
+
 class WorkoutRepCreate(BaseModel):
     rep_id: str
     set_id: str
