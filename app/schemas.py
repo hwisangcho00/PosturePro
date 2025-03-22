@@ -82,8 +82,20 @@ class WorkoutRepResponse(BaseModel):
     data: Any  # JSONB data
 
     class Config:
-        from_attributes = True  # ✅ Ensures SQLAlchemy objects can be converted to JSON
+        from_attributes = True  # Ensures SQLAlchemy objects can be converted to JSON
 
+class FullWorkoutDataCreate(BaseModel):
+    session: WorkoutSessionCreate
+    set: WorkoutSetBasicCreate
+    rep: WorkoutRepCreate
+
+class FullWorkoutDataResponse(BaseModel):
+    session: WorkoutSessionResponse
+    set: WorkoutSetBasicResponse
+    rep: WorkoutRepResponse
+
+    class Config:
+        from_attributes = True
 
 class HardwareDataCreate(BaseModel):
     set_id: str
