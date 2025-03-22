@@ -1,3 +1,4 @@
+import random
 from sqlalchemy.orm import Session
 from app import models, schemas
 from typing import Optional, List
@@ -183,7 +184,10 @@ def create_full_workout_data(db: Session, full_data: schemas.FullWorkoutDataCrea
     return rep
 
 
+# --------------- Form Data CRUD Operations ---------------
 
+def get_form_status_by_rep_id(db: Session, rep_id: str):
+    return random.choice([True, False])  
 
 
 
