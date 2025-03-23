@@ -1,8 +1,10 @@
+import random
 from sqlalchemy.orm import Session
 from app import models, schemas
 from typing import Optional, List
 from sqlalchemy.dialects.postgresql import insert
 import json
+from datetime import datetime, timedelta
 
 
 # ----------- User CRUD Operations -----------
@@ -28,8 +30,6 @@ def get_workout_type(db: Session, workout_type_id: str):
     return db.query(models.WorkoutType).filter(models.WorkoutType.workout_type_id == workout_type_id).first()
 
 # ----------- Workout Session CRUD Operations -----------
-
-
 def create_workout_session(db: Session, session_data: schemas.WorkoutSessionCreate):
     """Create a new workout session with email + timestamp as session_id."""
     db_session = models.WorkoutSession(
@@ -52,24 +52,17 @@ def get_workout_sessions_by_email(db: Session, email: str, limit: int = 10) -> L
     )
     return sessions
 
-# ----------- Workout Rep CRUD Operations -----------
-def create_workout_rep(db: Session, rep_data: schemas.WorkoutRepCreate):
-    db_rep = models.WorkoutRep(
-        rep_id=rep_data.rep_id,
-        set_id=rep_data.set_id,
-        data=rep_data.data
-    )
-    db.add(db_rep)
-    db.commit()
-    db.refresh(db_rep)
-    return db_rep
+def generate_set_id(session_id, set_number):
+    return f"{session_id}_{set_number}"
 
+def generate_rep_id(session_id, set_number, rep_number):
+    return f"{session_id}_{set_number}_{rep_number}"
 
 # ----------- Workout Set CRUD Operations -----------
 
 def create_basic_workout_set(db: Session, set_data: schemas.WorkoutSetBasicCreate):
     db_set = models.WorkoutSet(
-        set_id=set_data.set_id,
+        set_id= generate_set_id(set_data.session_id, set_data.set_number),
         session_id=set_data.session_id,
         weight=set_data.weight
     )
@@ -82,7 +75,7 @@ def create_workout_set(db: Session, set_data: schemas.WorkoutSetCreate):
     try:
         # Step 1: Create and commit the workout set first
         db_set = models.WorkoutSet(
-            set_id=set_data.set_id,
+            set_id= generate_set_id(set_data.session_id, set_data.set_number),
             session_id=set_data.session_id,
             weight=set_data.weight
         )
@@ -97,8 +90,10 @@ def create_workout_set(db: Session, set_data: schemas.WorkoutSetCreate):
 
         # Step 3: Add each rep to the workout_reps table
         for rep_number, rep_data in parsed_reps.items():
-            rep_id = f"{set_data.set_id}_{rep_number}"  # Generate unique rep_id
-            db_rep = models.WorkoutRep(rep_id=rep_id, set_id=set_data.set_id, data=rep_data)
+            set_id = generate_set_id(set_data.session_id, set_data.set_number)
+            rep_id = generate_rep_id(set_data.session_id, set_data.set_number, rep_number)  # Generate unique rep_id
+            
+            db_rep = models.WorkoutRep(rep_id=rep_id, set_id=set_id, data=rep_data)
             db.add(db_rep)
 
         db.commit()  # Commit all reps at once
@@ -115,6 +110,84 @@ def get_workout_set(db: Session, set_id: str):
 # Retrieve all sets for a specific workout session
 def get_sets_by_session_id(db: Session, session_id: str):
     return db.query(models.WorkoutSet).filter(models.WorkoutSet.session_id == session_id).all()
+
+
+# ----------- Workout Rep CRUD Operations -----------
+def create_workout_rep(db: Session, rep_data: schemas.WorkoutRepCreate):
+
+    rep_id = generate_rep_id(rep_data.session_id, rep_data.set_number, rep_data.rep_number)
+    set_id = generate_set_id(rep_data.session_id, rep_data.set_number)
+
+    db_rep = models.WorkoutRep(
+        rep_id=rep_id,
+        set_id=set_id,
+        data=rep_data.data
+    )
+    db.add(db_rep)
+    db.commit()
+    db.refresh(db_rep)
+    return db_rep
+
+
+# ----------- Full Workout CRUD Operations -----------
+
+def create_full_workout_data(db: Session, full_data: schemas.FullWorkoutDataCreate):
+
+    set_id = generate_set_id(full_data.session_id, full_data.set_number)
+    rep_id = generate_rep_id(full_data.session_id, full_data.set_number, full_data.rep_number)
+
+    # 1. Check for the session
+    session = db.query(models.WorkoutSession).filter(
+        models.WorkoutSession.session_id == full_data.session_id
+    ).first()
+    if not session:
+        session = models.WorkoutSession(
+            session_id=full_data.session_id,
+            email=full_data.email,
+        )
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+    
+    # 2. Check for the set
+    workout_set = db.query(models.WorkoutSet).filter(
+        models.WorkoutSet.set_id == set_id
+    ).first()
+    if not workout_set:
+        workout_set = models.WorkoutSet(
+            set_id=set_id,
+            session_id=full_data.session_id,
+            weight=full_data.weight,
+        )
+        db.add(workout_set)
+        db.commit()
+        db.refresh(workout_set)
+    
+    # 3. Create or update the rep
+    rep = db.query(models.WorkoutRep).filter(
+        models.WorkoutRep.rep_id == rep_id
+    ).first()
+    if not rep:
+        rep = models.WorkoutRep(
+            rep_id=rep_id,
+            set_id=set_id,
+            data=full_data.data
+        )
+        db.add(rep)
+        db.commit()
+        db.refresh(rep)
+    else:
+        rep.data = full_data.data
+        db.commit()
+        db.refresh(rep)
+    
+    return rep
+
+
+# --------------- Form Data CRUD Operations ---------------
+
+def get_form_status_by_rep_id(db: Session, rep_id: str):
+    return random.choice([True, False])  
 
 
 

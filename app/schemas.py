@@ -44,13 +44,13 @@ class WorkoutSessionResponse(BaseModel):
 
 # Schema for WorkoutSet
 class WorkoutSetCreate(BaseModel):
-    set_id: str
+    set_number: str
     session_id: str
     reps: Any
     weight: Optional[float] = None
 
 class WorkoutSetResponse(BaseModel):
-    set_id: str
+    set_number: str
     session_id: str
     weight: Optional[float]
 
@@ -59,7 +59,7 @@ class WorkoutSetResponse(BaseModel):
 
 # Schema for WorkoutSet w/o reps
 class WorkoutSetBasicCreate(BaseModel):
-    set_id: str        # Provided by the mobile app
+    set_number: str        # Provided by the mobile app
     session_id: str    # The associated workout session ID
     weight: Optional[float] = None
 
@@ -67,13 +67,14 @@ class WorkoutSetBasicResponse(BaseModel):
     set_id: str
     session_id: str
     weight: Optional[float]
-    
+
     class Config:
         from_attributes = True
 
 class WorkoutRepCreate(BaseModel):
-    rep_id: str
-    set_id: str
+    rep_number: str
+    set_number: str
+    session_id: str
     data: Any  # JSONB data
 
 class WorkoutRepResponse(BaseModel):
@@ -82,7 +83,25 @@ class WorkoutRepResponse(BaseModel):
     data: Any  # JSONB data
 
     class Config:
-        from_attributes = True  # ✅ Ensures SQLAlchemy objects can be converted to JSON
+        from_attributes = True  # Ensures SQLAlchemy objects can be converted to JSON
+
+class FullWorkoutDataCreate(BaseModel):
+    session_id: str
+    email: EmailStr
+    weight: Optional[float]
+    set_number: str
+    rep_number: str
+    data: Any
+
+class FullWorkoutDataResponse(BaseModel):
+
+    rep_id: str
+    set_id: str
+    data: Any  # JSONB data
+
+    class Config:
+        from_attributes = True
+
 
 
 class HardwareDataCreate(BaseModel):
