@@ -128,6 +128,9 @@ def create_workout_rep(db: Session, rep_data: schemas.WorkoutRepCreate):
     db.refresh(db_rep)
     return db_rep
 
+def get_rep_data_by_rep_id(db: Session, rep_id: str):
+    return db.query(models.WorkoutRep).filter(models.WorkoutRep.rep_id == rep_id).first()
+
 
 # ----------- Full Workout CRUD Operations -----------
 

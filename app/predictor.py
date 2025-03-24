@@ -9,5 +9,6 @@ def predict_posture(input_data):
     :param input_data: DataFrame containing the input features.
     :return: Predicted class label.
     """
+    # turn input_data (initially json) into a dataframe
     prediction = model.predict(input_data)
     return prediction
