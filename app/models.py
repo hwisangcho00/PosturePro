@@ -76,3 +76,16 @@ class WorkoutRep(Base):
     data = Column(JSONB, nullable=False)
 
     set = relationship("WorkoutSet", back_populates="reps")
+
+class GoodRep(Base):
+    __tablename__ = "good_reps"
+
+    id = Column(Integer, primary_key=True, index=True)
+    data = Column(JSONB, nullable=False)
+
+
+class BadRep(Base):
+    __tablename__ = "bad_reps"
+
+    id = Column(Integer, primary_key=True, index=True)
+    data = Column(JSONB, nullable=False)

@@ -234,3 +234,18 @@ def get_average_by_set_id(db: Session, set_id: str) -> Optional[dict]:
         "data": averages
     }
 
+
+def add_good_rep(db: Session, rep_data: schemas.GoodRepCreate):
+    db_rep = models.GoodRep(data=rep_data.data)
+    db.add(db_rep)
+    db.commit()
+    db.refresh(db_rep)
+    return db_rep
+
+
+def add_bad_rep(db: Session, rep_data: schemas.BadRepCreate):
+    db_rep = models.BadRep(data=rep_data.data)
+    db.add(db_rep)
+    db.commit()
+    db.refresh(db_rep)
+    return db_rep

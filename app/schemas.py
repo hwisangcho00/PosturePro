@@ -114,3 +114,26 @@ class HardwareDataResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class GoodRepCreate(BaseModel):
+    data: Any
+
+
+class BadRepCreate(BaseModel):
+    data: Any
+
+
+class GoodRepResponse(BaseModel):
+    id: int
+    data: Any
+
+    class Config:
+        from_attributes = True
+
+class BadRepResponse(BaseModel):
+    id: int
+    data: Any
+
+    class Config:
+        from_attributes = True
