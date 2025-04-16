@@ -139,6 +139,19 @@ def create_full_workout_data(db: Session, full_data: schemas.FullWorkoutDataCrea
     set_id = generate_set_id(full_data.session_id, full_data.set_number)
     rep_id = generate_rep_id(full_data.session_id, full_data.set_number, full_data.rep_number)
 
+    user = db.query(models.User).filter(models.User.email == full_data.email).first()
+
+    if not user:
+        user = models.User(
+            email=full_data.email,
+            first_name="First",
+            last_name="Last",
+            password_hash="hashed_password"
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
     # 1. Check for the session
     session = db.query(models.WorkoutSession).filter(
         models.WorkoutSession.session_id == full_data.session_id
