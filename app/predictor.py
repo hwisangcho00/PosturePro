@@ -1,7 +1,7 @@
-# import pandas as pd
-# import joblib
+import pandas as pd
+import joblib
 
-# model = joblib.load('ml_model/posture_classifier.pkl')
+model = joblib.load('app/ml_model/posture_classifier.pkl')
 
 def predict_posture(input_data):
     """
