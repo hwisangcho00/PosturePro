@@ -103,19 +103,6 @@ class FullWorkoutDataResponse(BaseModel):
         from_attributes = True
 
 
-
-class HardwareDataCreate(BaseModel):
-    set_id: str
-    data: Any
-
-class HardwareDataResponse(BaseModel):
-    set_id: str
-    data: Any
-
-    class Config:
-        from_attributes = True
-
-
 class GoodRepCreate(BaseModel):
     data: Any
 

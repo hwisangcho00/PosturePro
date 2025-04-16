@@ -194,47 +194,6 @@ def get_form_status_by_rep_id(db: Session, rep_id: str):
 
 
 
-# ----------- Hardware Data CRUD Operations -----------
-# def create_hardware_data(db: Session, hardware_data: schemas.HardwareDataCreate):
-#     stmt = insert(models.HardwareData).values(
-#         set_id=hardware_data.set_id,
-#         data=hardware_data.data
-#     ).on_conflict_do_update(
-#         index_elements=["set_id"],  # Primary key (ensures unique constraint)
-#         set_={"data": hardware_data.data}  # Update the data field if `set_id` exists
-#     )
-
-#     db.execute(stmt)
-#     db.commit()
-
-#     # Retrieve and return the updated row
-#     return db.query(models.HardwareData).filter(models.HardwareData.set_id == hardware_data.set_id).first()
-
-# def get_average_by_set_id(db: Session, set_id: str) -> Optional[dict]:
-#     # Query the database for the hardware data
-#     hardware_data = db.query(models.HardwareData).filter(models.HardwareData.set_id == set_id).first()
-
-#     if not hardware_data:
-#         return None
-
-#     # Parse the JSON data
-#     data = hardware_data.data
-
-#     # Ensure the required keys exist
-#     required_keys = ['xs', 'ys', 'zs', 'gxs', 'gys', 'gzs', 'envs', 'raws', 'rects']
-#     if not all(key in data for key in required_keys):
-#         raise ValueError("Missing required keys in hardware data JSON")
-
-#     # Compute the averages for each array
-#     averages = {key: sum(data[key]) / len(data[key]) if data[key] else 0 for key in required_keys}
-
-#     # Return the analysis result
-#     return {
-#         "set_id": hardware_data.set_id,
-#         "data": averages
-#     }
-
-
 def add_good_rep(db: Session, rep_data: schemas.GoodRepCreate):
     db_rep = models.GoodRep(data=rep_data.data)
     db.add(db_rep)
