@@ -22,15 +22,6 @@ def get_workout_sessions(
     """API endpoint to get latest workout sessions for a user, with adjustable limit."""
     return crud.get_workout_sessions_by_email(db, email, limit)
 
-# ----------- Workout Rep -----------
-@router.post("/reps/", response_model=schemas.WorkoutRepResponse)
-def create_rep(rep: schemas.WorkoutRepCreate, db: Session = Depends(get_db)):
-    try:
-        created_rep = crud.create_workout_rep(db=db, rep_data=rep)
-        return created_rep
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
 
 # ----------- Workout Set -----------
 
@@ -62,3 +53,25 @@ def get_sets_by_session(session_id: str, db: Session = Depends(get_db)):
     if not sets:
         raise HTTPException(status_code=404, detail="No workout sets found for this session")
     return sets
+
+# ----------- Workout Rep -----------
+@router.post("/reps/", response_model=schemas.WorkoutRepResponse)
+def create_rep(rep: schemas.WorkoutRepCreate, db: Session = Depends(get_db)):
+    try:
+        created_rep = crud.create_workout_rep(db=db, rep_data=rep)
+        return created_rep
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# ----------- Full Workout -----------
+@router.post("/full", response_model=schemas.FullWorkoutDataResponse)
+def create_full_workout_data_endpoint(
+    full_data: schemas.FullWorkoutDataCreate,
+    db: Session = Depends(get_db)
+):
+    try:
+        result = crud.create_full_workout_data(db, full_data)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

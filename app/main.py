@@ -11,6 +11,7 @@ app = FastAPI()
 # Include routers with consistent prefixes and tags
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(workouts.router, prefix="/api/workouts", tags=["Workouts"])
+app.include_router(metrics.router, prefix="/api/metrics", tags=["Metrics"])
 
 
 # app.include_router(metrics.router, prefix="/api/metrics", tags=["Metrics"])
