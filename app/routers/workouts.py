@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app import schemas, crud
 from app.database import get_db
 from typing import List
+import app.predictor as predictor
 
 router = APIRouter()
 
@@ -65,13 +66,16 @@ def create_rep(rep: schemas.WorkoutRepCreate, db: Session = Depends(get_db)):
 
 
 # ----------- Full Workout -----------
-@router.post("/full", response_model=schemas.FullWorkoutDataResponse)
+@router.post("/full")
 def create_full_workout_data_endpoint(
     full_data: schemas.FullWorkoutDataCreate,
     db: Session = Depends(get_db)
 ):
     try:
-        result = crud.create_full_workout_data(db, full_data)
-        return result
+        crud.create_full_workout_data(db, full_data)
+
+        form_status = predictor.predict_posture(full_data.data)
+
+        return {"form": form_status}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
