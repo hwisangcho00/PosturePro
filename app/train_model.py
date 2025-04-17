@@ -140,9 +140,35 @@ X = data.drop('Form', axis=1)
 # Split the data into training and testing sets.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+param_grid = {
+    'criterion': ['gini', 'entropy'],
+    'max_depth': [None, 3, 4, 5, 6, 7, 10],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+
+dtc = DecisionTreeClassifier(random_state=42)
+
+grid_search = GridSearchCV(estimator=dtc,
+                           param_grid=param_grid,
+                           cv=5,
+                           scoring='accuracy',
+                           n_jobs=-1)
+
+
+grid_search.fit(X_train.values, y_train)
+
+print("Best Hyperparameters:", grid_search.best_params_)
+print("Best Cross-Validation Score: {:.2f}".format(grid_search.best_score_))
+
+model = grid_search.best_estimator_
+
+predictions = model.predict(X_test)
+test_accuracy = accuracy_score(y_test, predictions)
+
 # Train a Decision Tree classifier.
-model = DecisionTreeClassifier(random_state=42)
-model.fit(X_train.values, y_train)
+#model = DecisionTreeClassifier(random_state=42)
+#model.fit(X_train.values, y_train)
 
 # Evaluate the model.
 predictions = model.predict(X_test)
