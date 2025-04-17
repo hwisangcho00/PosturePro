@@ -52,6 +52,10 @@ def load_and_process_json(json_path, form_label, flatten_lists=True):
 
     # Drop any columns that start with "env"
     df = df.drop(columns=[col for col in df.columns if col.startswith("env")])
+    # Drop any columns that start with "z"
+    df = df.drop(columns=[col for col in df.columns if col.startswith("z")])
+    # Drop any columns that contain "1" in their name
+    df = df.drop(columns=[col for col in df.columns if "1" in col])
         
     if flatten_lists:
         df = expand_list_columns(df)
@@ -138,7 +142,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Train a Decision Tree classifier.
 model = DecisionTreeClassifier(random_state=42)
-model.fit(X_train, y_train)
+model.fit(X_train.values, y_train)
 
 # Evaluate the model.
 predictions = model.predict(X_test)

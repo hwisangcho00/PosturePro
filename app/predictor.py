@@ -39,6 +39,10 @@ def dict_to_instance(d: dict) -> pd.DataFrame:
 
     df = pd.DataFrame([flat])
     df = df.loc[:, ~df.columns.str.startswith("env")]
+    df = df.loc[:, ~df.columns.str.startswith("z")]
+    df = df.loc[:, ~df.columns.str.contains("roll1")]
+    df = df.loc[:, ~df.columns.str.contains("pitch1")]
+
 
     # Drop any unwanted columns (e.g. rep_id) if present
     if 'rep_id' in df.columns:
@@ -68,6 +72,8 @@ def predict_posture(input_data: str):
     # 4) feed to your model
     y_pred = model.predict(df.values)   # or df.iloc[0] depending on your model API
     
+    print(y_pred)
+
     y_pred = y_pred[0]  # if you want a single value instead of an array
 
     print(y_pred)
